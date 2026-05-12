@@ -21,29 +21,29 @@ const seedDatabase = async (): Promise<void> => {
 
         const clients = await Client.insertMany([
             {
-                name: "Juan Perez",
-                curp: "PEPJ010101HDFRRN01",
-                email: "juanperez@gmail.com",
-                phone: "6121234567",
-                address: "La Paz, Baja California Sur",
+                name: "Valeria Montaño Ruiz",
+                curp: "MORV980714MBSNLR08",
+                email: "valeria.montano@nexusbank.mx",
+                phone: "6121845297",
+                address: "Col. Centro, La Paz, Baja California Sur",
                 createdAt: new Date(),
                 status: true
             },
             {
-                name: "Maria Lopez",
-                curp: "LOPM020202MDFRRN02",
-                email: "marialopez@gmail.com",
-                phone: "6127654321",
-                address: "Los Cabos, Baja California Sur",
+                name: "Emiliano Cota Verdugo",
+                curp: "COVE950221HBSRTR05",
+                email: "emiliano.cota@nexusbank.mx",
+                phone: "6242337810",
+                address: "Fracc. El Tezal, Los Cabos, Baja California Sur",
                 createdAt: new Date(),
                 status: true
             },
             {
-                name: "Carlos Ramirez",
-                curp: "RACJ990303HDFRRN03",
-                email: "carlosramirez@gmail.com",
-                phone: "6129876543",
-                address: "Comondú, Baja California Sur",
+                name: "Fernanda Salgado Ibarra",
+                curp: "SAIF000912MBSLBR03",
+                email: "fernanda.salgado@nexusbank.mx",
+                phone: "6131176402",
+                address: "Col. Pueblo Nuevo, Ciudad Constitución, Baja California Sur",
                 createdAt: new Date(),
                 status: true
             }
@@ -112,7 +112,7 @@ const seedDatabase = async (): Promise<void> => {
                 toAccount: "001",
                 type: "Transfer",
                 amount: 1500,
-                description: "Transfer to Juan Perez",
+                description: "Transfer to Valeria",
                 date: new Date(),
                 status: "Completed"
             }

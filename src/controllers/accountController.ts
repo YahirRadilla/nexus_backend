@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import Account from "../models/Account.js";
 import Client from "../models/Client.js";
+import Transaction from "../models/Transaction.js";
 
 export const getAccounts = async (
     req: Request,
@@ -65,6 +66,50 @@ export const createAccount = async (
 
         res.status(500).json({
             message: "Error creating account"
+        });
+
+    }
+
+};
+
+export const getAccountDetails = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+
+    try {
+
+        const cuenta = req.params.cuenta as string;
+
+        const account = await Account.findOne({
+            accountNumber: cuenta
+        }).populate("clientId");
+
+        if (!account) {
+
+            res.status(404).json({
+                message: "Account not found"
+            });
+
+            return;
+        }
+
+        const transactions = await Transaction.find({
+            $or: [
+                { fromAccount: cuenta },
+                { toAccount: cuenta }
+            ]
+        });
+
+        res.json({
+            account,
+            transactions
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Error getting account details"
         });
 
     }
