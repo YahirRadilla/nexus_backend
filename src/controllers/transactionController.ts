@@ -67,9 +67,19 @@ export const deposit = async (
             return;
         }
 
-        const account = await Account.findOne({
-            accountNumber
-        });
+        const account = await Account.findOneAndUpdate(
+            {
+                accountNumber
+            },
+            {
+                $inc: {
+                    balance: amount
+                }
+            },
+            {
+                new: true
+            }
+        );
 
         if (!account) {
 
@@ -79,10 +89,6 @@ export const deposit = async (
 
             return;
         }
-
-        account.balance += amount;
-
-        await account.save();
 
         const transaction = await Transaction.create({
             fromAccount: null,
@@ -109,7 +115,6 @@ export const deposit = async (
     }
 
 };
-
 export const withdraw = async (
     req: Request,
     res: Response
@@ -132,31 +137,29 @@ export const withdraw = async (
             return;
         }
 
-        const account = await Account.findOne({
-            accountNumber
-        });
+        const account = await Account.findOneAndUpdate(
+            {
+                accountNumber,
+                balance: { $gte: amount }
+            },
+            {
+                $inc: {
+                    balance: -amount
+                }
+            },
+            {
+                new: true
+            }
+        );
 
         if (!account) {
 
-            res.status(404).json({
-                message: "Account not found"
-            });
-
-            return;
-        }
-
-        if (account.balance < amount) {
-
             res.status(400).json({
-                message: "Insufficient funds"
+                message: "Insufficient funds or account not found"
             });
 
             return;
         }
-
-        account.balance -= amount;
-
-        await account.save();
 
         const transaction = await Transaction.create({
             fromAccount: accountNumber,
