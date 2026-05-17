@@ -6,6 +6,7 @@ export interface ITransaction extends Document {
     type: string;
     amount: number;
     description: string;
+    branch: string;
     date: Date;
     status: string;
 }
@@ -28,6 +29,10 @@ const TransactionSchema: Schema = new Schema({
         required: true
     },
     description: {
+        type: String,
+        required: true
+    },
+    branch: {
         type: String,
         required: true
     },

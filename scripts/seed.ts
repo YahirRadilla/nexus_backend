@@ -86,6 +86,7 @@ const seedDatabase = async (): Promise<void> => {
                 type: "Deposit",
                 amount: 1000,
                 description: "Cash deposit",
+                branch: "Sucursal La Paz Centro",
                 date: new Date(),
                 status: "Completed"
             },
@@ -95,6 +96,7 @@ const seedDatabase = async (): Promise<void> => {
                 type: "Withdraw",
                 amount: 500,
                 description: "ATM withdrawal",
+                branch: "Sucursal Los Cabos Marina",
                 date: new Date(),
                 status: "Completed"
             },
@@ -104,6 +106,7 @@ const seedDatabase = async (): Promise<void> => {
                 type: "Deposit",
                 amount: 2200,
                 description: "Transfer received",
+                branch: "Sucursal CDMX Reforma",
                 date: new Date(),
                 status: "Completed"
             },
@@ -113,6 +116,7 @@ const seedDatabase = async (): Promise<void> => {
                 type: "Transfer",
                 amount: 1500,
                 description: "Transfer to Valeria",
+                branch: "Sucursal Guadalajara Centro",
                 date: new Date(),
                 status: "Completed"
             }
