@@ -45,6 +45,34 @@ export const createTransaction = async (
 
 };
 
+export const getHistory = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+
+    try {
+
+        const cuenta = req.params.cuenta as string;
+
+        const transactions = await Transaction.find({
+            $or: [
+                { fromAccount: cuenta },
+                { toAccount: cuenta }
+            ]
+        }).sort({ date: -1 });
+
+        res.json(transactions);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Error getting history"
+        });
+
+    }
+
+};
+
 export const deposit = async (
     req: Request,
     res: Response
@@ -187,30 +215,3 @@ export const withdraw = async (
 
 };
 
-export const getHistory = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
-
-    try {
-
-        const cuenta = req.params.cuenta as string;
-
-        const transactions = await Transaction.find({
-            $or: [
-                { fromAccount: cuenta },
-                { toAccount: cuenta }
-            ]
-        }).sort({ date: -1 });
-
-        res.json(transactions);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: "Error getting history"
-        });
-
-    }
-
-};
