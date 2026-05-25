@@ -11,9 +11,11 @@ const seedDatabase = async (): Promise<void> => {
 
     try {
 
-        await mongoose.connect(process.env.MONGO_URI as string);
+        await mongoose.connect(process.env.MONGO_URI as string, {
+            replicaSet: "rsBanco"
+        });
 
-        console.log("MongoDB connected");
+        console.log("MongoDB replica set connected");
 
         await Client.deleteMany({});
         await Account.deleteMany({});
@@ -49,6 +51,8 @@ const seedDatabase = async (): Promise<void> => {
             }
         ]);
 
+        console.log("Clients inserted");
+
         await Account.insertMany([
             {
                 clientId: clients[0]!._id,
@@ -78,6 +82,8 @@ const seedDatabase = async (): Promise<void> => {
                 status: "Active"
             }
         ]);
+
+        console.log("Accounts inserted");
 
         await Transaction.insertMany([
             {
@@ -122,13 +128,37 @@ const seedDatabase = async (): Promise<void> => {
             }
         ]);
 
-        console.log("Database seeded successfully");
+        console.log("Transactions inserted");
+
+
+        const clientsCount = await Client.countDocuments();
+        const accountsCount = await Account.countDocuments();
+        const transactionsCount = await Transaction.countDocuments();
+
+        console.log("\nIntegrity verification:");
+        console.log(`Clients: ${clientsCount}`);
+        console.log(`Accounts: ${accountsCount}`);
+        console.log(`Transactions: ${transactionsCount}`);
+
+        if (
+            clientsCount === 3 &&
+            accountsCount === 3 &&
+            transactionsCount === 4
+        ) {
+
+            console.log("\nReplication integrity verified successfully");
+
+        } else {
+
+            console.log("\nReplication integrity failed");
+
+        }
 
         process.exit(0);
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Seed error:", error);
 
         process.exit(1);
 
