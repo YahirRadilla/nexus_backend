@@ -16,6 +16,10 @@ import {
     generateToken
 } from "../utils/jwt.js";
 
+import type {
+    AuthRequest
+} from "../middlewares/authMiddleware.js";
+
 export const register = async (
     req: Request,
     res: Response
@@ -179,6 +183,52 @@ export const login = async (
         res.status(500).json({
             message:
                 "Error logging in"
+        });
+
+    }
+
+};
+
+export const me = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
+
+    try {
+
+        const client =
+            await Client.findById(
+                req.clientId
+            );
+
+        if (!client) {
+
+            res.status(404).json({
+                message:
+                    "Client not found"
+            });
+
+            return;
+        }
+
+        const account =
+            await Account.findOne({
+                clientId:
+                    client._id
+            });
+
+        res.json({
+            client,
+            account
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message:
+                "Error getting user"
         });
 
     }

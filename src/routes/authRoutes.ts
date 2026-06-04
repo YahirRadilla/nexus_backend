@@ -2,8 +2,13 @@ import express from "express";
 
 import {
     register,
-    login
+    login,
+    me
 } from "../controllers/authController.js";
+
+import {
+    authenticate
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -15,6 +20,12 @@ router.post(
 router.post(
     "/login",
     login
+);
+
+router.get(
+    "/me",
+    authenticate,
+    me
 );
 
 export default router;
