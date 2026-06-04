@@ -3,6 +3,19 @@ import type {
     Response
 } from "express";
 
+import bcrypt from "bcryptjs";
+
+import Client from "../models/Client.js";
+import Account from "../models/Account.js";
+
+import {
+    getNextAccountNumber
+} from "../utils/accountGenerator.js";
+
+import {
+    generateToken
+} from "../utils/jwt.js";
+
 export const register = async (
     req: Request,
     res: Response
@@ -10,12 +23,92 @@ export const register = async (
 
     try {
 
+        const {
+            name,
+            curp,
+            email,
+            password,
+            phone,
+            address
+        } = req.body;
 
+        const existingClient =
+            await Client.findOne({
+                $or: [
+                    { email },
+                    { curp }
+                ]
+            });
+
+        if (existingClient) {
+
+            res.status(400).json({
+                message:
+                    "Client already exists"
+            });
+
+            return;
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(
+                password,
+                10
+            );
+
+        const client =
+            await Client.create({
+                name,
+                curp,
+                email,
+                password:
+                    hashedPassword,
+                phone,
+                address
+            });
+
+        const accountNumber =
+            await getNextAccountNumber();
+
+        const account =
+            await Account.create({
+                clientId: client._id,
+                accountNumber,
+                accountType:
+                    "Savings",
+                balance: 0,
+                currency: "MXN"
+            });
+
+        const token =
+            generateToken(
+                client._id.toString()
+            );
+
+        res.status(201).json({
+            message:
+                "User registered successfully",
+            token,
+            client: {
+                id: client._id,
+                name: client.name,
+                email: client.email
+            },
+            account: {
+                accountNumber:
+                    account.accountNumber,
+                balance:
+                    account.balance
+            }
+        });
 
     } catch (error) {
 
+        console.error(error);
+
         res.status(500).json({
-            message: "Error registering user"
+            message:
+                "Error registering user"
         });
 
     }
@@ -29,12 +122,63 @@ export const login = async (
 
     try {
 
+        const {
+            email,
+            password
+        } = req.body;
 
+        const client =
+            await Client.findOne({
+                email
+            }).select("+password");
+
+        if (!client) {
+
+            res.status(401).json({
+                message:
+                    "Invalid credentials"
+            });
+
+            return;
+        }
+
+        const passwordMatch =
+            await bcrypt.compare(
+                password,
+                client.password
+            );
+
+        if (!passwordMatch) {
+
+            res.status(401).json({
+                message:
+                    "Invalid credentials"
+            });
+
+            return;
+        }
+
+        const token =
+            generateToken(
+                client._id.toString()
+            );
+
+        res.json({
+            token,
+            client: {
+                id: client._id,
+                name: client.name,
+                email: client.email
+            }
+        });
 
     } catch (error) {
 
+        console.error(error);
+
         res.status(500).json({
-            message: "Error logging in"
+            message:
+                "Error logging in"
         });
 
     }
