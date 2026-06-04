@@ -6,14 +6,14 @@ import type {
 
 import jwt from "jsonwebtoken";
 
-interface TokenPayload {
-    clientId: string;
-}
-
 export interface AuthRequest
     extends Request {
 
     clientId?: string;
+}
+
+interface TokenPayload {
+    clientId: string;
 }
 
 const JWT_SECRET =
@@ -32,14 +32,11 @@ export const authenticate = (
 
         if (
             !authHeader ||
-            !authHeader.startsWith(
-                "Bearer "
-            )
+            !authHeader.startsWith("Bearer ")
         ) {
 
             res.status(401).json({
-                message:
-                    "Token required"
+                message: "Token required"
             });
 
             return;
@@ -51,8 +48,7 @@ export const authenticate = (
         if (!token) {
 
             res.status(401).json({
-                message:
-                    "Token required"
+                message: "Token required"
             });
 
             return;
@@ -72,8 +68,7 @@ export const authenticate = (
     } catch {
 
         res.status(401).json({
-            message:
-                "Invalid token"
+            message: "Invalid token"
         });
 
     }
