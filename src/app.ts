@@ -9,7 +9,7 @@ import accountRoutes from "./routes/accountRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 
 import authRoutes from "./routes/authRoutes.js";
-
+import profileRoutes from "./routes/profileRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -25,6 +25,7 @@ app.use("/api/clients", clientRoutes);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
 
 const PORT = process.env.PORT || 3000;
 
