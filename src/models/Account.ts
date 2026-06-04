@@ -1,3 +1,4 @@
+import type { match } from "assert/strict";
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAccount extends Document {
@@ -19,7 +20,8 @@ const AccountSchema: Schema = new Schema({
     accountNumber: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        match: /^\d{10}$/
     },
     accountType: {
         type: String,
