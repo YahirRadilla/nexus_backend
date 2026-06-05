@@ -19,6 +19,7 @@ import {
 import type {
     AuthRequest
 } from "../middlewares/authMiddleware.js";
+import { createAuditLog } from "../utils/audit.js";
 
 export const register = async (
     req: Request,
@@ -143,6 +144,11 @@ export const login = async (
                     "Invalid credentials"
             });
 
+            await createAuditLog(
+                "LOGIN_FAILED",
+                `Failed login attempt for ${email}`
+            );
+
             return;
         }
 
@@ -159,6 +165,11 @@ export const login = async (
                     "Invalid credentials"
             });
 
+            await createAuditLog(
+                "LOGIN_FAILED",
+                `Failed login attempt for ${email}`
+            );
+
             return;
         }
 
@@ -166,6 +177,12 @@ export const login = async (
             generateToken(
                 client._id.toString()
             );
+
+        await createAuditLog(
+            "LOGIN_SUCCESS",
+            `User ${client.email} logged in`,
+            client._id.toString()
+        );
 
         res.json({
             token,
