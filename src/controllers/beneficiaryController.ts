@@ -66,6 +66,29 @@ export const createBeneficiary = async (
 
             return;
         }
+        
+        if (!req.clientId) {
+
+            res.status(401).json({
+                message:
+                    "Unauthorized"
+            });
+
+            return;
+        }
+
+        if (
+            account.clientId.toString() ===
+            req.clientId
+        ) {
+
+            res.status(400).json({
+                message:
+                    "You cannot add your own account as beneficiary"
+            });
+
+            return;
+        }
 
         const exists =
             await Beneficiary.findOne({
