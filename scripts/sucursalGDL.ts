@@ -13,7 +13,7 @@ const operateGDL = async (): Promise<void> => {
             }
         );
 
-        console.log("Sucursal Guadalajara:", response.data);
+        console.log("Sucursal Guadalajar:", response.data);
 
     } catch (error: any) {
 
