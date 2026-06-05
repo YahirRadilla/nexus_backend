@@ -13,6 +13,7 @@ import profileRoutes from "./routes/profileRoutes.js";
 import beneficiaryRoutes from "./routes/beneficiaryRoutes.js";
 import auditRoutes from "./routes/auditRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/beneficiaries", beneficiaryRoutes);
 app.use("/api/audit", auditRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 const PORT = process.env.PORT || 3000;
 
