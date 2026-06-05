@@ -11,6 +11,8 @@ import transactionRoutes from "./routes/transactionRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import beneficiaryRoutes from "./routes/beneficiaryRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -28,6 +30,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/beneficiaries", beneficiaryRoutes);
+app.use("/api/audit", auditRoutes);
 
 const PORT = process.env.PORT || 3000;
 
