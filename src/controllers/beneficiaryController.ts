@@ -9,6 +9,8 @@ import type {
 import Beneficiary from "../models/Beneficiary.js";
 import Account from "../models/Account.js";
 
+import { beneficiarySchema } from "../validators/beneficiaryValidator.js";
+
 const getClientId = (
     req: AuthRequest
 ): string => {
@@ -28,7 +30,20 @@ export const createBeneficiary = async (
 ): Promise<void> => {
 
     try {
+        const validation =
+            beneficiarySchema.safeParse(
+                req.body
+            );
 
+        if (!validation.success) {
+
+            res.status(400).json({
+                errors:
+                    validation.error.flatten()
+            });
+
+            return;
+        }
         const ownerId =
             getClientId(req);
 

@@ -21,12 +21,29 @@ import type {
 } from "../middlewares/authMiddleware.js";
 import { createAuditLog } from "../utils/audit.js";
 
+import { registerSchema, loginSchema } from "../validators/authValidator.js";
+
 export const register = async (
     req: Request,
     res: Response
 ): Promise<void> => {
 
     try {
+
+        const validation =
+            registerSchema.safeParse(
+                req.body
+            );
+
+        if (!validation.success) {
+
+            res.status(400).json({
+                errors:
+                    validation.error.flatten()
+            });
+
+            return;
+        }
 
         const {
             name,
@@ -126,6 +143,21 @@ export const login = async (
 ): Promise<void> => {
 
     try {
+
+        const validation =
+            loginSchema.safeParse(
+                req.body
+            );
+
+        if (!validation.success) {
+
+            res.status(400).json({
+                errors:
+                    validation.error.flatten()
+            });
+
+            return;
+        }
 
         const {
             email,
