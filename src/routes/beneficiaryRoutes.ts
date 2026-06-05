@@ -4,7 +4,7 @@ import {
     createBeneficiary,
     getBeneficiaries,
     deleteBeneficiary
-} from "../controllers/BeneficiaryController.js";
+} from "../controllers/beneficiaryController.js";
 
 import {
     authenticate
