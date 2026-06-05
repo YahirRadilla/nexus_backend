@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 import Transaction from "../models/Transaction.js";
 import Account from "../models/Account.js";
 
+import mongoose from "mongoose";
+
 export const getTransactions = async (
     req: Request,
     res: Response
@@ -215,3 +217,148 @@ export const withdraw = async (
 
 };
 
+export const transfer = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+
+    const session =
+        await mongoose.startSession();
+
+    try {
+
+        const {
+            fromAccount,
+            toAccount,
+            amount,
+            branch
+        } = req.body;
+
+        if (
+            !amount ||
+            amount <= 0
+        ) {
+
+            res.status(400).json({
+                message:
+                    "Invalid amount"
+            });
+
+            return;
+        }
+
+        if (
+            fromAccount ===
+            toAccount
+        ) {
+
+            res.status(400).json({
+                message:
+                    "Cannot transfer to same account"
+            });
+
+            return;
+        }
+
+        session.startTransaction();
+
+        const origin =
+            await Account.findOne({
+                accountNumber:
+                    fromAccount
+            }).session(session);
+
+        const destination =
+            await Account.findOne({
+                accountNumber:
+                    toAccount
+            }).session(session);
+
+        if (
+            !origin ||
+            !destination
+        ) {
+
+            await session.abortTransaction();
+
+            res.status(404).json({
+                message:
+                    "Account not found"
+            });
+
+            return;
+        }
+
+        if (
+            origin.balance <
+            amount
+        ) {
+
+            await session.abortTransaction();
+
+            res.status(400).json({
+                message:
+                    "Insufficient funds"
+            });
+
+            return;
+        }
+
+        origin.balance -= amount;
+
+        destination.balance += amount;
+
+        await origin.save({
+            session
+        });
+
+        await destination.save({
+            session
+        });
+
+        const transaction =
+            await Transaction.create(
+                [{
+                    fromAccount,
+                    toAccount,
+                    type:
+                        "Transfer",
+                    amount,
+                    description:
+                        "Bank transfer",
+                    branch,
+                    status:
+                        "Completed"
+                }],
+                {
+                    session
+                }
+            );
+
+        await session.commitTransaction();
+
+        res.status(200).json({
+            message:
+                "Transfer successful",
+            transaction:
+                transaction[0]
+        });
+
+    } catch (error) {
+
+        await session.abortTransaction();
+
+        console.error(error);
+
+        res.status(500).json({
+            message:
+                "Error processing transfer"
+        });
+
+    } finally {
+
+        await session.endSession();
+
+    }
+
+};

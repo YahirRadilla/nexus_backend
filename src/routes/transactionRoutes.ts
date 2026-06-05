@@ -5,7 +5,8 @@ import {
     createTransaction,
     deposit,
     withdraw,
-    getHistory
+    getHistory,
+    transfer
 } from "../controllers/transactionController.js";
 
 const router = express.Router();
@@ -19,5 +20,7 @@ router.post("/", createTransaction);
 router.post("/deposito", deposit);
 
 router.post("/retiro", withdraw);
+
+router.post("/transferencia", transfer);
 
 export default router;
