@@ -225,16 +225,16 @@ export const transfer = async (
     res: Response
 ): Promise<void> => {
 
-    const result =
+    const validation =
         transferSchema.safeParse(
             req.body
         );
 
-    if (!result.success) {
+    if (!validation.success) {
 
         res.status(400).json({
             errors:
-                result.error.flatten()
+                validation.error.flatten()
         });
 
         return;
