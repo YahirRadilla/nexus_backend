@@ -8,6 +8,7 @@ import {
     getHistory,
     transfer
 } from "../controllers/transactionController.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -21,6 +22,6 @@ router.post("/deposito", deposit);
 
 router.post("/retiro", withdraw);
 
-router.post("/transferencia", transfer);
+router.post("/transferencia", authenticate, transfer);
 
 export default router;

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import Transaction from "../models/Transaction.js";
 import Account from "../models/Account.js";
+import type { AuthRequest } from "../middlewares/authMiddleware.js";
 
 import mongoose from "mongoose";
 
@@ -218,7 +219,7 @@ export const withdraw = async (
 };
 
 export const transfer = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ): Promise<void> => {
 
@@ -227,10 +228,20 @@ export const transfer = async (
 
     try {
 
+        if (!req.clientId) {
+
+            res.status(401).json({
+                message:
+                    "Unauthorized"
+            });
+
+            return;
+        }
+
         const {
-            fromAccount,
             toAccount,
             amount,
+            description,
             branch
         } = req.body;
 
@@ -247,10 +258,34 @@ export const transfer = async (
             return;
         }
 
+        session.startTransaction();
+
+        const origin =
+            await Account.findOne({
+                clientId: req.clientId
+            }).session(session);
+
+        if (!origin) {
+
+            await session.abortTransaction();
+
+            res.status(404).json({
+                message:
+                    "Origin account not found"
+            });
+
+            return;
+        }
+
+        const fromAccount =
+            origin.accountNumber;
+
         if (
             fromAccount ===
             toAccount
         ) {
+
+            await session.abortTransaction();
 
             res.status(400).json({
                 message:
@@ -260,30 +295,19 @@ export const transfer = async (
             return;
         }
 
-        session.startTransaction();
-
-        const origin =
-            await Account.findOne({
-                accountNumber:
-                    fromAccount
-            }).session(session);
-
         const destination =
             await Account.findOne({
                 accountNumber:
                     toAccount
             }).session(session);
 
-        if (
-            !origin ||
-            !destination
-        ) {
+        if (!destination) {
 
             await session.abortTransaction();
 
             res.status(404).json({
                 message:
-                    "Account not found"
+                    "Destination account not found"
             });
 
             return;
@@ -325,8 +349,11 @@ export const transfer = async (
                         "Transfer",
                     amount,
                     description:
+                        description ||
                         "Bank transfer",
-                    branch,
+                    branch:
+                        branch ||
+                        "Online",
                     status:
                         "Completed"
                 }],
@@ -340,6 +367,12 @@ export const transfer = async (
         res.status(200).json({
             message:
                 "Transfer successful",
+            balances: {
+                origin:
+                    origin.balance,
+                destination:
+                    destination.balance
+            },
             transaction:
                 transaction[0]
         });
