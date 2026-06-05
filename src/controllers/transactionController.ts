@@ -6,6 +6,8 @@ import type { AuthRequest } from "../middlewares/authMiddleware.js";
 
 import mongoose from "mongoose";
 
+import { transferSchema } from "../validators/transferValidator.js";
+
 export const getTransactions = async (
     req: Request,
     res: Response
@@ -222,6 +224,21 @@ export const transfer = async (
     req: AuthRequest,
     res: Response
 ): Promise<void> => {
+
+    const result =
+        transferSchema.safeParse(
+            req.body
+        );
+
+    if (!result.success) {
+
+        res.status(400).json({
+            errors:
+                result.error.flatten()
+        });
+
+        return;
+    }
 
     const session =
         await mongoose.startSession();
