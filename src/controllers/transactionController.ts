@@ -412,3 +412,69 @@ export const transfer = async (
     }
 
 };
+
+export const getMyHistory = async (
+    req: AuthRequest,
+    res: Response
+): Promise<void> => {
+
+    try {
+
+        if (!req.clientId) {
+
+            res.status(401).json({
+                message:
+                    "Unauthorized"
+            });
+
+            return;
+        }
+
+        const account =
+            await Account.findOne({
+                clientId:
+                    req.clientId
+            });
+
+        if (!account) {
+
+            res.status(404).json({
+                message:
+                    "Account not found"
+            });
+
+            return;
+        }
+
+        const transactions =
+            await Transaction.find({
+                $or: [
+                    {
+                        fromAccount:
+                            account.accountNumber
+                    },
+                    {
+                        toAccount:
+                            account.accountNumber
+                    }
+                ]
+            }).sort({
+                date: -1
+            });
+
+        res.json(
+            transactions
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message:
+                "Error getting history"
+        });
+
+    }
+
+};
