@@ -5,6 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
     "dev": "nodemon",
     "seed": "node --loader ts-node/esm scripts/seed.ts",
     "simular": "node --loader ts-node/esm scripts/simulacionConcurrente.ts",
